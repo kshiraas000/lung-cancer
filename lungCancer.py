@@ -32,27 +32,33 @@ X_test = np.array(X_test)
 y_train = np.array(y_train)
 y_test = np.array(y_test)
 
-# Define the model architecture
+# Model architecture
 model = Sequential()
-model.add(Dense(64, activation='relu', input_dim=X_train.shape[1]))
-model.add(Dropout(0.5))
+model.add(Dense(256, activation='relu', input_dim=X_train.shape[1]))
+model.add(Dropout(0.2))
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(32, activation='relu'))
-model.add(Dropout(0.5))
+model.add(Dropout(0.2))
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(16, activation='relu'))
-model.add(Dropout(0.5))
+model.add(Dropout(0.2))
 model.add(Dense(8, activation='relu'))
-model.add(Dropout(0.5))
+model.add(Dropout(0.2))
 model.add(Dense(4, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(2, activation='relu'))
-model.add(Dropout(0.5))
+model.add(Dropout(0.2))
 model.add(Dense(1, activation='sigmoid'))
 
 # Compile the model
 model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=0.001), metrics=['accuracy'])
 
 # Train the model
-model.fit(X_train, y_train, epochs=10, batch_size=64)
+model.fit(X_train, y_train, epochs=450, batch_size=64)
 
 # Evaluate the model
 loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
