@@ -1,8 +1,10 @@
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.optimizers import Adam
 
 # Load the dataset
 data = pd.read_csv('lungCancerData.csv')
@@ -18,16 +20,40 @@ X_encoded = X.apply(label_encoder.fit_transform)
 # Perform one-hot encoding
 X_encoded = pd.get_dummies(X_encoded, drop_first=True)
 
+# Encode target variable
+y_encoded = label_encoder.fit_transform(y)
+
 # Split the data into training and testing sets with stratification
-X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.2, stratify=y, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_encoded, y_encoded, test_size=0.2, stratify=y_encoded, random_state=42)
 
-# Train the decision tree classifier
-model = DecisionTreeClassifier(random_state=42)
-model.fit(X_train, y_train)
+# Convert the data to numpy arrays
+X_train = np.array(X_train)
+X_test = np.array(X_test)
+y_train = np.array(y_train)
+y_test = np.array(y_test)
 
-# Make predictions on the test set
-y_pred = model.predict(X_test)
+# Define the model architecture
+model = Sequential()
+model.add(Dense(64, activation='relu', input_dim=X_train.shape[1]))
+model.add(Dropout(0.5))
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(16, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(8, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(4, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(2, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation='sigmoid'))
+
+# Compile the model
+model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=0.001), metrics=['accuracy'])
+
+# Train the model
+model.fit(X_train, y_train, epochs=10, batch_size=64)
 
 # Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
+loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
 print("Accuracy:", accuracy)
